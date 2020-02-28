@@ -1,0 +1,41 @@
+; This program pushes 14 first Fibonacci numbers
+
+; A procedure to duplicate two top numbers on the stack
+dup2:      ; (a b -- a b a b)
+  swap     ; b a
+  dup      ; b a a
+  rot      ; a a b
+  dup      ; a a b b
+  rot      ; a b b a
+  swap     ; a b a b
+  ret
+
+; Counter's address ($000:000) in the fib function
+; !def counter { #0 #0 }
+
+; This procedure pushes fibonacci numbers on the stack
+fib:
+  #0 #1
+
+  fib_loop:
+    &dup2 call add ; add 2 top numbers
+
+    ; Decrement the counter
+    #0 #0 load
+    #1 neg add dup
+    #0 #0 stor
+
+    ; Continue the loop if non-zero
+    *fib_end bz
+    &fib_loop jmp
+
+  fib_end:
+    ret
+
+; Program entry point
+reset:
+  #12 #0 #0 stor
+  &fib call
+
+loop:
+  &loop jmp
